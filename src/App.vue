@@ -4,9 +4,9 @@
     <bet-label />
   </div>
   <div class="row m-3">
-    <tokens-label />
-    <goal-label />
-    <method-label />
+    <tokens-label class="border-bottom"/>
+    <goal-label class="border-bottom"/>
+    <method-label class="border-bottom"/>
   </div>
 </template>
 
