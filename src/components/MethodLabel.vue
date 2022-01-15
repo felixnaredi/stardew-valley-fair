@@ -1,7 +1,7 @@
 <template>
   <main class="row">
-    <span class="col">Method</span>
-    <span class="col">{{ $store.state.method }}</span>
+    <span class="col-3">Method</span>
+    <span class="col-3">{{ $store.state.method }}</span>
   </main>
 </template>
 

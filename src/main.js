@@ -5,12 +5,12 @@ import App from './App.vue'
 const store = new Vuex.Store({
     state: {
         tokens: 1000,
-        goal: 4900,
+        tokenGoal: 2000,
         method: "kelly"
     },
     getters: {
         bet: (state) => {
-            const maxBet = state.goal - state.tokens;
+            const maxBet = state.tokenGoal - state.tokens;
 
             if (state.method == "kelly") {
                 if (state.tokens == 1) {
