@@ -3,17 +3,21 @@
     <span class="col-3">Goal</span>
     <input
       v-if="customAmount"
+      id="custom-token-goal-amount-input"
       type="text"
       class="col-7 border-0"
       :class="{ 'text-success': done }"
-      :value="displayGoal"
+      :value="$store.state.tokenGoal + (this.done ? ' ✅' : '')"
       @change="setCustomTokenGoal"
+      aria-label="enter custom token goal"
     />
     <select
       v-else
+      id="select-token-goal-amount-input"
       class="col-7"
       :class="{ 'text-success': done }"
       v-model="$store.state.tokenGoal"
+      aria-label="select token goal"
     >
       <option
         v-for="{ value, label } in options"
@@ -24,9 +28,12 @@
         {{ label }} ({{ value }}){{ $store.state.tokens >= value ? " ✅" : "" }}
       </option>
     </select>
-    <div class="col">
-      <input type="checkbox" v-model="customAmount" />
-    </div>
+    <input
+      type="checkbox"
+      v-model="customAmount"
+      class="col m-1"
+      aria-label="change token goal input type"
+    />
   </main>
 </template>
 
@@ -60,9 +67,6 @@ export default {
   computed: {
     done() {
       return this.$store.state.tokens >= this.$store.state.tokenGoal;
-    },
-    displayGoal() {
-      return this.$store.state.tokenGoal + (this.done ? " ✅" : "");
     },
   },
 };

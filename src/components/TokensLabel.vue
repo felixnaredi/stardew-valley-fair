@@ -6,6 +6,7 @@
       type="text"
       :value="$store.state.tokens"
       @change="customSetTokenAmount"
+      aria-label="enter current token amount"
     />
   </main>
 </template>
