@@ -1,14 +1,9 @@
 <template>
-  <span class="display-4">Bet {{ bet }}</span>
+  <span class="display-4">Bet {{ $store.getters.bet }}</span>
 </template>
 
 <script>
 export default {
   name: "BetLabel",
-  data() {
-    return {
-      bet: 100,
-    };
-  },
 };
 </script>

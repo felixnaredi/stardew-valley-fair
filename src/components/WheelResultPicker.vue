@@ -1,7 +1,7 @@
 <template>
   <main class="row m-1 justify-content-center">
-    <div id="green-result-button" class="col-2 m-1"></div>
-    <div id="orange-result-button" class="col-2 m-1"></div>
+    <div id="green-result-button" class="col-2 m-1" @mousedown="$store.dispatch('winBet')"></div>
+    <div id="orange-result-button" class="col-2 m-1" @mousedown="$store.dispatch('loseBet')"></div>
   </main>
 </template>
 
