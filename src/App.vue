@@ -1,26 +1,25 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <wheel-result-picker />
+  <div class="text-center">
+    <bet-label />
+  </div>
+  <div class="row m-3">
+    <tokens-label />
+  </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import BetLabel from "./components/BetLabel.vue";
+import TokensLabel from "./components/TokensLabel.vue";
+import WheelResultPicker from "./components/WheelResultPicker.vue";
 
 export default {
-  name: 'App',
-  components: {
-    HelloWorld
-  }
-}
+  name: "App",
+  components: { WheelResultPicker, BetLabel, TokensLabel },
+};
 </script>
 
 <style>
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
 }
 </style>
