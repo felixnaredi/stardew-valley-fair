@@ -16,7 +16,7 @@ const store = new Vuex.Store({
                 if (state.tokens == 1) {
                     return 1;
                 } else {
-                    return Math.min(maxBet, Math.floor(state.tokens / 2));
+                    return Math.max(0, Math.min(maxBet, Math.floor(state.tokens / 2)));
                 }
             }
         }

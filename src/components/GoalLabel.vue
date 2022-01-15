@@ -12,7 +12,7 @@ export default {
   name: "GoalLabel",
   computed: {
     done() {
-      return this.$store.state.tokens == this.$store.state.goal;
+      return this.$store.state.tokens >= this.$store.state.goal;
     },
   },
 };
