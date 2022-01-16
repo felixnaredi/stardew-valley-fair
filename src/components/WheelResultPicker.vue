@@ -27,8 +27,4 @@ div {
   height: 6.5em;
   width: 6.5em;
 }
-
-div:hover {
-  cursor: pointer;
-}
 </style>

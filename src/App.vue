@@ -1,14 +1,22 @@
 <template>
-  <wheel-result-picker />
-  <div class="text-center">
-    <bet-label />
-  </div>
-  <div class="row m-3">
-    <tokens-label class="border-bottom" />
-    <goal-label class="border-bottom" />
-    <method-label class="border-bottom" />
-  </div>
-  <instructions />
+  <main class="container d-flex flex-column min-vh-100">
+    <wheel-result-picker />
+    <div class="text-center">
+      <bet-label />
+    </div>
+    <div class="row m-3">
+      <tokens-label class="border-bottom" />
+      <goal-label class="border-bottom" />
+      <method-label class="border-bottom" />
+    </div>
+    <instructions />
+  </main>
+  <footer class="p-2 bg-dark text-light d-flex justify-content-between mt-4">
+    <p>2022 Felix Naredi</p>
+    <div>
+      <a href="https://github.com/felixnaredi/stardew-valley-fair">GitHub</a>
+    </div>
+  </footer>
 </template>
 
 <script>
