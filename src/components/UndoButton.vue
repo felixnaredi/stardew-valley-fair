@@ -31,7 +31,7 @@
 	c52.271-21.652,92.983-62.364,114.636-114.636C442.739,200.6,418.532,105.826,354.24,47.4z"
       />
     </svg>
-    <label class="d-block" for="#undo-button">undo</label>
+    <label class="d-block user-select-none" for="#undo-button">undo</label>
   </div>
 </template>
 

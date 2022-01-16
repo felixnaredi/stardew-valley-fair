@@ -5,8 +5,8 @@
     </div>
     <div class="d-flex justify-content-between">
       <undo-button class="align-self-center" />
-      <bet-label class="" />
-      <span />
+      <bet-label />
+      <undo-button class="align-self-center invisible" />
     </div>
     <div class="row m-3">
       <tokens-label class="border-bottom" />
@@ -37,11 +37,11 @@ export default {
   components: {
     BetLabel,
     GoalLabel,
+    Instructions,
     MethodLabel,
     TokensLabel,
-    WheelResultPicker,
-    Instructions,
     UndoButton,
+    WheelResultPicker,
   },
 };
 </script>

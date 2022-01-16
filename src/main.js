@@ -27,6 +27,10 @@ const store = new Vuex.Store({
             const oldAmount = state.tokens;
             const amount = Number(newAmount);
 
+            if (oldAmount === amount) {
+                return;
+            }
+
             state.tokens = amount;
 
             state.history.push({
