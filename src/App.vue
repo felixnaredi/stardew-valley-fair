@@ -1,8 +1,12 @@
 <template>
   <main class="container d-flex flex-column min-vh-100">
-    <wheel-result-picker />
-    <div class="text-center">
-      <bet-label />
+    <div class="d-flex justify-content-center">
+      <wheel-result-picker />
+    </div>
+    <div class="d-flex justify-content-between">
+      <undo-button class="align-self-center" />
+      <bet-label class="" />
+      <span />
     </div>
     <div class="row m-3">
       <tokens-label class="border-bottom" />
@@ -26,6 +30,7 @@ import MethodLabel from "./components/MethodLabel.vue";
 import TokensLabel from "./components/TokensLabel.vue";
 import WheelResultPicker from "./components/WheelResultPicker.vue";
 import Instructions from "./components/Instructions.vue";
+import UndoButton from "./components/UndoButton.vue";
 
 export default {
   name: "App",
@@ -36,6 +41,7 @@ export default {
     TokensLabel,
     WheelResultPicker,
     Instructions,
+    UndoButton,
   },
 };
 </script>

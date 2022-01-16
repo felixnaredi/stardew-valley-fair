@@ -16,7 +16,7 @@ export default {
   name: "TokensLabel",
   methods: {
     customSetTokenAmount(event) {
-      this.$store.state.tokens = Number(event.target.value);
+      this.$store.commit("setTokens", event.target.value);
     },
   },
 };

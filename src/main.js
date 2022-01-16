@@ -6,7 +6,8 @@ const store = new Vuex.Store({
     state: {
         tokens: 1000,
         tokenGoal: 2000,
-        method: "kelly"
+        method: "kelly",
+        history: [],
     },
     getters: {
         bet: (state) => {
@@ -21,13 +22,41 @@ const store = new Vuex.Store({
             }
         }
     },
-    actions: {
-        winBet: ({ getters, state }) => {
-            state.tokens += getters.bet;
+    mutations: {
+        setTokens: (state, newAmount) => {
+            const oldAmount = state.tokens;
+            const amount = Number(newAmount);
+
+            state.tokens = amount;
+
+            state.history.push({
+                action: "tokens-changed",
+                from: oldAmount,
+                to: amount
+            });
         },
-        loseBet: ({ getters, state }) => {
-            state.tokens -= getters.bet;
+        undo: (state) => {
+            const lastAction = state.history.pop();
+
+            if (lastAction) {
+                switch (lastAction.action) {
+                    case "tokens-changed": {
+                        state.tokens = lastAction.from;
+                    }
+                }
+            }
         }
+    },
+    actions: {
+        incrementTokens: ({ commit, state }, amount) => {
+            commit("setTokens", state.tokens + amount)
+        },
+        winBet: ({ getters, dispatch }) => {
+            dispatch("incrementTokens", getters.bet);
+        },
+        loseBet: ({ getters, dispatch }) => {
+            dispatch("incrementTokens", -getters.bet);
+        },
     }
 })
 

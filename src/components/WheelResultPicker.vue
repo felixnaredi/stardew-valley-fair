@@ -1,5 +1,5 @@
 <template>
-  <main class="row m-1 justify-content-center">
+  <main class="row m-1">
     <div
       class="col-2 m-1 bg-green highlight-active"
       @mousedown="$store.dispatch('winBet')"
