@@ -2,6 +2,7 @@ import { createApp } from "vue";
 import anime from "animejs/lib/anime.es.js";
 import App from "./App.vue";
 import Vuex from "vuex";
+import { KellyBetStrategy } from "./strategy";
 
 /**
  * Creates an animation between two numeric values.
@@ -22,31 +23,22 @@ function animateValue(from, to, callback) {
 
 const INITIAL_TOKENS = 1000;
 const INITIAL_TOKEN_GOAL = 2000;
+const INITIAL_STRATEGY = new KellyBetStrategy();
 
 const store = new Vuex.Store({
   state: {
     tokens: INITIAL_TOKENS,
     tokenGoal: INITIAL_TOKEN_GOAL,
-    method: "kelly",
+    strategy: INITIAL_STRATEGY,
     history: [],
     displayedTokens: INITIAL_TOKENS,
-
-    // TODO:
-    //   Value should be set automatically during initialization.
-    displayedBet: Math.floor(INITIAL_TOKENS / 2),
+    displayedBet: INITIAL_STRATEGY.getBetSize(
+      INITIAL_TOKENS,
+      INITIAL_TOKEN_GOAL
+    ),
   },
   getters: {
-    bet: (state) => {
-      const maxBet = state.tokenGoal - state.tokens;
-
-      if (state.method == "kelly") {
-        if (state.tokens == 1) {
-          return 1;
-        } else {
-          return Math.max(0, Math.min(maxBet, Math.floor(state.tokens / 2)));
-        }
-      }
-    },
+    bet: (state) => state.strategy.getBetSize(state.tokens, state.tokenGoal),
   },
   mutations: {
     setDisplayedTokens: (state, amount) => (state.displayedTokens = amount),

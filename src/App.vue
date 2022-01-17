@@ -11,7 +11,7 @@
     <div class="row m-3">
       <tokens-label class="border-bottom" />
       <goal-label class="border-bottom" />
-      <method-label class="border-bottom" />
+      <strategy-label class="border-bottom" />
     </div>
     <instructions />
   </main>
@@ -26,7 +26,7 @@
 <script>
 import BetLabel from "./components/BetLabel.vue";
 import GoalLabel from "./components/GoalLabel.vue";
-import MethodLabel from "./components/MethodLabel.vue";
+import StrategyLabel from "./components/StrategyLabel.vue";
 import TokensLabel from "./components/TokensLabel.vue";
 import WheelResultPicker from "./components/WheelResultPicker.vue";
 import Instructions from "./components/Instructions.vue";
@@ -38,7 +38,7 @@ export default {
     BetLabel,
     GoalLabel,
     Instructions,
-    MethodLabel,
+    StrategyLabel,
     TokensLabel,
     UndoButton,
     WheelResultPicker,
