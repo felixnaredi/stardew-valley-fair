@@ -19,7 +19,7 @@ export default {
     customSetTokenAmount(event) {
       this.$store.dispatch("setTokens", {
         amount: event.target.value,
-        animate: false,
+        animateTokens: false,
       });
     },
   },
