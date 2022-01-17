@@ -7,7 +7,7 @@
       'text-secondary': historyIsEmpty,
       'border-dark': !historyIsEmpty,
     }"
-    @click="$store.commit('undo')"
+    @click="$store.dispatch('undo')"
   >
     <!-- Generator: Adobe Illustrator 19.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
     <svg

@@ -6,26 +6,26 @@
       id="custom-token-goal-amount-input"
       type="text"
       class="col-7 border-0"
-      :class="{ 'text-success': done }"
-      :value="$store.state.tokenGoal + (this.done ? ' ✅' : '')"
-      @change="setCustomTokenGoal"
+      :class="{ 'text-success': doneWithTokenGoal }"
+      :value="$store.state.tokenGoal + (doneWithTokenGoal ? ' ✅' : '')"
+      @change="setTokenGoal"
       aria-label="enter custom token goal"
     />
     <select
       v-else
       id="select-token-goal-amount-input"
       class="col-7"
-      :class="{ 'text-success': done }"
-      v-model="$store.state.tokenGoal"
+      :class="{ 'text-success': doneWithTokenGoal }"
+      @change="setTokenGoal"
       aria-label="select token goal"
     >
       <option
         v-for="{ value, label } in options"
         :key="value"
         :value="value"
-        :class="$store.state.tokens >= value ? 'text-success' : 'text-dark'"
+        :class="doneWith(value) ? 'text-success' : 'text-dark'"
       >
-        {{ label }} ({{ value }}){{ $store.state.tokens >= value ? " ✅" : "" }}
+        {{ label }} ({{ value }}){{ doneWith(value) ? " ✅" : "" }}
       </option>
     </select>
     <input
@@ -60,13 +60,16 @@ export default {
     };
   },
   methods: {
-    setCustomTokenGoal(event) {
-      this.$store.state.tokenGoal = Number(event.target.value);
+    setTokenGoal(event) {
+      this.$store.commit("setTokenGoal", Number(event.target.value));
+    },
+    doneWith(partialGoal) {
+      return this.$store.state.displayedTokens >= partialGoal;
     },
   },
   computed: {
-    done() {
-      return this.$store.state.tokens >= this.$store.state.tokenGoal;
+    doneWithTokenGoal() {
+      return this.doneWith(this.$store.state.tokenGoal);
     },
   },
 };
