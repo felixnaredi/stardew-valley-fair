@@ -1,12 +1,12 @@
 <template>
   <main class="container d-flex flex-column min-vh-100">
-    <div class="d-flex justify-content-center">
-      <wheel-result-picker />
-    </div>
     <div class="d-flex justify-content-between">
       <undo-button class="align-self-center" />
-      <bet-label />
+      <wheel-result-picker />
       <undo-button class="align-self-center invisible" />
+    </div>
+    <div class="d-flex justify-content-center">
+      <bet-label />
     </div>
     <div class="row m-3">
       <tokens-label class="border-bottom" />
