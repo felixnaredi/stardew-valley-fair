@@ -61,7 +61,7 @@ export default {
   },
   methods: {
     setTokenGoal(event) {
-      this.$store.commit("setTokenGoal", Number(event.target.value));
+      this.$store.dispatch("setTokenGoal", { amount: Number(event.target.value) });
     },
     doneWith(partialGoal) {
       return this.$store.state.displayedTokens >= partialGoal;

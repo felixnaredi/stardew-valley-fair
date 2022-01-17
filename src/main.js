@@ -1,7 +1,7 @@
 import { createApp } from 'vue'
-import Vuex from 'vuex'
-import App from './App.vue'
 import anime from "animejs/lib/anime.es.js"
+import App from './App.vue'
+import Vuex from 'vuex'
 
 const store = new Vuex.Store({
     state: {
@@ -32,6 +32,9 @@ const store = new Vuex.Store({
         setDisplayedTokens: (state, amount) => {
             state.displayedTokens = amount;
         },
+        setDisplayedBet: (state, amount) => {
+            state.displayedBet = amount;
+        },
         setTokens: (state, amount) => {
             state.tokens = amount;
         },
@@ -50,7 +53,7 @@ const store = new Vuex.Store({
         }
     },
     actions: {
-        setTokens: ({ state, commit }, { amount, pushHistory = true, animate = true }) => {
+        setTokens: ({ state, getters, commit }, { amount, pushHistory = true, animateTokens = true, animateBet = true }) => {
             const oldAmount = state.tokens;
             const newAmount = Number(amount);
 
@@ -58,7 +61,11 @@ const store = new Vuex.Store({
                 return;
             }
 
+            const oldBet = getters.bet;
+
             commit("setTokens", newAmount);
+
+            const newBet = getters.bet;
 
             if (pushHistory) {
                 commit("pushHistory", {
@@ -68,7 +75,7 @@ const store = new Vuex.Store({
                 });
             }
 
-            if (animate) {
+            if (animateTokens) {
                 const animatedValue = { value: oldAmount };
 
                 anime({
@@ -84,6 +91,44 @@ const store = new Vuex.Store({
                 commit("setDisplayedTokens", newAmount);
             }
 
+            if (animateBet) {
+                const animatedValue = { value: oldBet };
+
+                anime({
+                    targets: animatedValue,
+                    value: [oldBet, newBet],
+                    round: 1,
+                    easing: "easeInOutExpo",
+                    update() {
+                        commit("setDisplayedBet", animatedValue.value);
+                    }
+                });
+            } else {
+                commit("setDisplayedBet", newBet);
+            }
+        },
+        setTokenGoal: ({ getters, commit }, { amount, animateBet = true}) => {
+            const oldBet = getters.bet;
+
+            commit("setTokenGoal", amount);
+
+            const newBet = getters.bet;
+
+            if (animateBet) {
+                const animatedValue = { value: oldBet };
+
+                anime({
+                    targets: animatedValue,
+                    value: [oldBet, newBet],
+                    round: 1,
+                    easing: "easeInOutExpo",
+                    update() {
+                        commit("setDisplayedBet", animatedValue.value);
+                    }
+                });
+            } else {
+                commit("setDisplayedBet", newBet);
+            }           
         },
         incrementTokens: ({ dispatch, state }, amount) => {
             dispatch("setTokens", { amount: state.tokens + amount })
