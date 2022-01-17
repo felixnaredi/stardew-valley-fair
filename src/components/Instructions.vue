@@ -26,7 +26,7 @@
       </p>
       <li class="list-group-item">
         Place a bet with the same amount of tokens as the value next to
-        <b>Bet</b>. Currently at {{ $store.getters.bet }} tokens.
+        <b>Bet</b>. Currently at {{ $store.state.displayedBet }} tokens.
       </li>
       <li class="list-group-item">
         Always bet on <span class="bg-green text-white ps-1 pe-1">GREEN</span>.
