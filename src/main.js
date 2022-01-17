@@ -20,17 +20,20 @@ function animateValue(from, to, callback) {
     });
 }
 
+const INITIAL_TOKENS = 1000;
+const INITIAL_TOKEN_GOAL = 2000;
+
 const store = new Vuex.Store({
     state: {
-        tokens: 1000,
-        tokenGoal: 2000,
+        tokens: INITIAL_TOKENS,
+        tokenGoal: INITIAL_TOKEN_GOAL,
         method: "kelly",
         history: [],
+        displayedTokens: INITIAL_TOKENS,
 
         // TODO:
-        //   Values should be set automatically during initialization.
-        displayedTokens: 1000,
-        displayedBet: 500,
+        //   Value should be set automatically during initialization.
+        displayedBet: Math.floor(INITIAL_TOKENS / 2),
     },
     getters: {
         bet: (state) => {
@@ -46,24 +49,13 @@ const store = new Vuex.Store({
         }
     },
     mutations: {
-        setDisplayedTokens: (state, amount) => {
-            state.displayedTokens = amount;
-        },
-        setDisplayedBet: (state, amount) => {
-            state.displayedBet = amount;
-        },
-        setTokens: (state, amount) => {
-            state.tokens = amount;
-        },
-        setTokenGoal: (state, newAmount) => {
-            state.tokenGoal = newAmount;
-        },
-        pushHistory: (state, action) => {
-            state.history.push(action);
-        },
+        setDisplayedTokens: (state, amount) => state.displayedTokens = amount,
+        setDisplayedBet: (state, amount) => state.displayedBet = amount,
+        setTokens: (state, amount) => state.tokens = amount,
+        setTokenGoal: (state, newAmount) => state.tokenGoal = newAmount,
+        pushHistory: (state, action) => state.history.push(action),
         popHistory: (state, callback) => {
             const lastAction = state.history.pop();
-
             if (lastAction) {
                 callback(lastAction);
             }
@@ -123,12 +115,8 @@ const store = new Vuex.Store({
         incrementTokens: ({ dispatch, state }, amount) => {
             dispatch("setTokens", { amount: state.tokens + amount })
         },
-        winBet: ({ getters, dispatch }) => {
-            dispatch("incrementTokens", getters.bet);
-        },
-        loseBet: ({ getters, dispatch }) => {
-            dispatch("incrementTokens", -getters.bet);
-        },
+        winBet: ({ getters, dispatch }) => dispatch("incrementTokens", getters.bet),
+        loseBet: ({ getters, dispatch }) => dispatch("incrementTokens", -getters.bet),
         undo: ({ commit, dispatch }) => {
             commit("popHistory", (action) => {
                 if (action.kind === "tokens-changed") {
