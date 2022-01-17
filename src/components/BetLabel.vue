@@ -6,7 +6,7 @@
     }"
   >
     <span class="display-4">Bet </span>
-    <span id="bet-amount-label" class="display-4">{{ initialBet }}</span>
+    <span id="bet-amount-label" class="display-4">{{ localBetState }}</span>
   </div>
 </template>
 
@@ -17,13 +17,9 @@ export default {
   name: "BetLabel",
   data() {
     return {
-      initialBet: null,
-      disabled: false,
+      localBetState: this.$store.getters.bet,
+      disabled: this.$store.getters.bet === 0,
     };
-  },
-  created() {
-    this.initialBet = this.bet;
-    this.disabled = this.bet === 0;
   },
   computed: {
     bet() {
@@ -32,7 +28,7 @@ export default {
   },
   watch: {
     bet(newValue, oldValue) {
-      const self = this;
+      const _this = this;
 
       anime({
         targets: "#bet-amount-label",
@@ -40,12 +36,10 @@ export default {
         round: 1,
         easing: "easeInOutExpo",
         update(anim) {
-          if (anim.animations[0].currentValue > 0) {
-            self.disabled = false;
-          }
-          if (anim.animations[0].currentValue === 0) {
-            self.disabled = true;
-          }
+          _this.disabled = !anim.animations[0].currentValue > 0;
+        },
+        complete() {
+          _this.localBetState = newValue;
         },
       });
     },
