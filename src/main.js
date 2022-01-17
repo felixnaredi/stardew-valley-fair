@@ -3,6 +3,23 @@ import anime from "animejs/lib/anime.es.js"
 import App from './App.vue'
 import Vuex from 'vuex'
 
+/**
+ * Creates an animation between two numeric values. 
+ * @param {Number} from - Value animation starts from.
+ * @param {Number} to  - Value animations ends on.
+ * @callback callback  - Handler for animation updates.
+ */
+function animateValue(from, to, callback) {
+    const animatedValue = { value: from };
+    anime({
+        targets: animatedValue,
+        value: [from, to],
+        round: 1,
+        easing: "easeInOutExpo",
+        update: () => callback(animatedValue.value)
+    });
+}
+
 const store = new Vuex.Store({
     state: {
         tokens: 1000,
@@ -44,16 +61,19 @@ const store = new Vuex.Store({
         pushHistory: (state, action) => {
             state.history.push(action);
         },
-        popHistory: (state, lambda) => {
+        popHistory: (state, callback) => {
             const lastAction = state.history.pop();
 
             if (lastAction) {
-                lambda(lastAction);
+                callback(lastAction);
             }
         }
     },
     actions: {
-        setTokens: ({ state, getters, commit }, { amount, pushHistory = true, animateTokens = true, animateBet = true }) => {
+        setTokens: (
+            { state, getters, commit },
+            { amount, pushHistory = true, animateTokens = true, animateBet = true }
+        ) => {
             const oldAmount = state.tokens;
             const newAmount = Number(amount);
 
@@ -76,38 +96,18 @@ const store = new Vuex.Store({
             }
 
             if (animateTokens) {
-                const animatedValue = { value: oldAmount };
-
-                anime({
-                    targets: animatedValue,
-                    value: [oldAmount, newAmount],
-                    round: 1,
-                    easing: "easeInOutExpo",
-                    update() {
-                        commit("setDisplayedTokens", animatedValue.value);
-                    }
-                });
+                animateValue(oldAmount, newAmount, (value) => commit("setDisplayedTokens", value));
             } else {
                 commit("setDisplayedTokens", newAmount);
             }
 
             if (animateBet) {
-                const animatedValue = { value: oldBet };
-
-                anime({
-                    targets: animatedValue,
-                    value: [oldBet, newBet],
-                    round: 1,
-                    easing: "easeInOutExpo",
-                    update() {
-                        commit("setDisplayedBet", animatedValue.value);
-                    }
-                });
+                animateValue(oldBet, newBet, (value) => commit("setDisplayedBet", value));
             } else {
                 commit("setDisplayedBet", newBet);
             }
         },
-        setTokenGoal: ({ getters, commit }, { amount, animateBet = true}) => {
+        setTokenGoal: ({ getters, commit }, { amount, animateBet = true }) => {
             const oldBet = getters.bet;
 
             commit("setTokenGoal", amount);
@@ -115,20 +115,10 @@ const store = new Vuex.Store({
             const newBet = getters.bet;
 
             if (animateBet) {
-                const animatedValue = { value: oldBet };
-
-                anime({
-                    targets: animatedValue,
-                    value: [oldBet, newBet],
-                    round: 1,
-                    easing: "easeInOutExpo",
-                    update() {
-                        commit("setDisplayedBet", animatedValue.value);
-                    }
-                });
+                animateValue(oldBet, newBet, (value) => commit("setDisplayedBet", value));
             } else {
                 commit("setDisplayedBet", newBet);
-            }           
+            }
         },
         incrementTokens: ({ dispatch, state }, amount) => {
             dispatch("setTokens", { amount: state.tokens + amount })
