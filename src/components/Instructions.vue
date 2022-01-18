@@ -17,18 +17,19 @@
     <ol class="list-group list-group-numbered">
       <li class="list-group-item">
         <span
-          >Click on the number after <b>Tokens</b> to enter the amount of tokens
+          >Click on the number after <i>Tokens</i> to enter the amount of tokens
           you own. Currently at </span
-        ><input
-          class="border-0"
-          type="text"
-          :value="$store.state.displayedTokenAmount"
+        ><span
+          id="instructions-token-amount-input"
+          contenteditable="true"
+          class="d-inline"
           @change="customSetTokenAmount"
           aria-label="enter current token amount"
-        />
+          >{{ $store.state.displayedTokenAmount }}</span
+        ><span> tokens.</span>
       </li>
       <li class="list-group-item">
-        Select a token goal from the dropdown menu next to <b>Goal</b> or click
+        Select a token goal from the dropdown menu next to <i>Goal</i> or click
         the square to the left to enter a custom amount.
       </li>
       <p class="m-2 mt-3">
@@ -37,7 +38,7 @@
       <li class="list-group-item">
         <span
           >Place a bet with the same amount of tokens as the value next to
-          <b>Bet</b>. Currently at
+          <i>Bet</i>. Currently at
         </span>
         <div class="d-inline-block">
           <span>{{ $store.state.displayedBet }} tokens.</span>
@@ -82,18 +83,32 @@ export default {
       hideInstructions: true,
     };
   },
+  mounted() {
+    const _this = this;
+    const tokenAmountInput = document.getElementById(
+      "instructions-token-amount-input"
+    );
+
+    tokenAmountInput.addEventListener("beforeinput", (event) => {
+      if (event.inputType === "insertParagraph") {
+        event.preventDefault();
+        event.target.blur();
+      }
+    });
+
+    tokenAmountInput.addEventListener("focusout", (event) => {
+      _this.customSetTokenAmount(Number(event.target.innerHTML));
+    });
+  },
   methods: {
-    customSetTokenAmount(event) {
-      this.$store.dispatch("setCustomTokenAmount", event.target.value);
+    customSetTokenAmount(value) {
+      this.$store.dispatch("setCustomTokenAmount", value);
     },
   },
 };
 </script>
 
 <style scoped>
-input {
-  width: 5em;
-}
 .small-square {
   width: 1em;
   height: 1em;
