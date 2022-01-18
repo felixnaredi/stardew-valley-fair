@@ -5,7 +5,7 @@
       id="token-amount-label"
       class="col-3 border-0"
       type="text"
-      :value="$store.state.displayedTokens"
+      :value="$store.state.displayedTokenAmount"
       @change="customSetTokenAmount"
       aria-label="enter current token amount"
     />
@@ -17,10 +17,7 @@ export default {
   name: "TokensLabel",
   methods: {
     customSetTokenAmount(event) {
-      this.$store.dispatch("setTokens", {
-        amount: event.target.value,
-        animateTokens: false,
-      });
+      this.$store.dispatch("setCustomTokenAmount", event.target.value);
     },
   },
 };

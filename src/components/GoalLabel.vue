@@ -7,7 +7,7 @@
       type="text"
       class="col-7 border-0"
       :class="{ 'text-success': doneWithTokenGoal }"
-      :value="$store.state.tokenGoal + (doneWithTokenGoal ? ' ✅' : '')"
+      :value="tokenGoal + (doneWithTokenGoal ? ' ✅' : '')"
       @change="setTokenGoal"
       aria-label="enter custom token goal"
     />
@@ -24,6 +24,7 @@
         :key="value"
         :value="value"
         :class="doneWith(value) ? 'text-success' : 'text-dark'"
+        :selected="tokenGoal === value"
       >
         {{ label }} ({{ value }}){{ doneWith(value) ? " ✅" : "" }}
       </option>
@@ -61,17 +62,18 @@ export default {
   },
   methods: {
     setTokenGoal(event) {
-      this.$store.dispatch("setTokenGoal", {
-        amount: Number(event.target.value),
-      });
+      this.$store.dispatch("setTokenGoal", Number(event.target.value));
     },
     doneWith(partialGoal) {
-      return this.$store.state.displayedTokens >= partialGoal;
+      return this.$store.state.displayedTokenAmount >= partialGoal;
     },
   },
   computed: {
+    tokenGoal() {
+      return this.$store.state.tokenGoal;
+    },
     doneWithTokenGoal() {
-      return this.doneWith(this.$store.state.tokenGoal);
+      return this.doneWith(this.tokenGoal);
     },
   },
 };

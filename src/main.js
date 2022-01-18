@@ -21,31 +21,37 @@ function animateValue(from, to, callback) {
   });
 }
 
-const INITIAL_TOKENS = 1000;
+const INITIAL_TOKEN_AMOUNT = 1000;
 const INITIAL_TOKEN_GOAL = 2000;
 const INITIAL_STRATEGY = new KellyBetStrategy();
 
 const store = new Vuex.Store({
   state: {
-    tokens: INITIAL_TOKENS,
+    tokenAmount: INITIAL_TOKEN_AMOUNT,
     tokenGoal: INITIAL_TOKEN_GOAL,
     strategy: INITIAL_STRATEGY,
     history: [],
-    displayedTokens: INITIAL_TOKENS,
+    displayedTokenAmount: INITIAL_TOKEN_AMOUNT,
     displayedBet: INITIAL_STRATEGY.getBetSize(
-      INITIAL_TOKENS,
+      INITIAL_TOKEN_AMOUNT,
       INITIAL_TOKEN_GOAL
     ),
   },
   getters: {
-    bet: (state) => state.strategy.getBetSize(state.tokens, state.tokenGoal),
+    bet: (state) =>
+      state.strategy.getBetSize(state.tokenAmount, state.tokenGoal),
   },
   mutations: {
-    setDisplayedTokens: (state, amount) => (state.displayedTokens = amount),
+    setDisplayedTokenAmount: (state, amount) =>
+      (state.displayedTokenAmount = amount),
     setDisplayedBet: (state, amount) => (state.displayedBet = amount),
-    setTokens: (state, amount) => (state.tokens = amount),
+    setTokenAmount: (state, amount) => (state.tokenAmount = amount),
     setTokenGoal: (state, newAmount) => (state.tokenGoal = newAmount),
-    pushHistory: (state, action) => state.history.push(action),
+    pushHistory: (state) =>
+      state.history.push({
+        tokenAmount: state.tokenAmount,
+        tokenGoal: state.tokenGoal,
+      }),
     popHistory: (state, callback) => {
       const lastAction = state.history.pop();
       if (lastAction) {
@@ -55,57 +61,20 @@ const store = new Vuex.Store({
   },
   actions: {
     /**
-     * Set tokens to `amount`.
-     *
-     * The `payload` can contain the following fields:
-     *   - amount: The amount to set `tokens` to (required).
-     *   - pushHistory: If true the change will be pushed to `history` (defaults to `true`).
-     *   - animateTokens: If true, `displayedTokens` will be animated (defaults to `true`).
-     *   - animateBet: If true, `displayedBet` will be animated (defaults to `true`).
+     * Sets `state.tokenAmount` to an custom amount.
      *
      * @param {ActionContext} context
-     * @param {Object} payload - Descriptor for the modification. Must include field `amount`.
+     * @param {Number} amount - New value of `state.tokenAmount`.
      */
-    setTokens: (
-      { state, getters, commit },
-      { amount, pushHistory = true, animateTokens = true, animateBet = true }
-    ) => {
-      const oldAmount = state.tokens;
-      const newAmount = Number(amount);
-
-      if (oldAmount === newAmount) {
-        return;
-      }
+    setCustomTokenAmount({ commit, getters }, amount) {
+      commit("pushHistory");
 
       const oldBet = getters.bet;
-
-      commit("setTokens", newAmount);
-
-      const newBet = getters.bet;
-
-      if (pushHistory) {
-        commit("pushHistory", {
-          kind: "tokens-changed",
-          from: oldAmount,
-          to: newAmount,
-        });
-      }
-
-      if (animateTokens) {
-        animateValue(oldAmount, newAmount, (value) =>
-          commit("setDisplayedTokens", value)
-        );
-      } else {
-        commit("setDisplayedTokens", newAmount);
-      }
-
-      if (animateBet) {
-        animateValue(oldBet, newBet, (value) =>
-          commit("setDisplayedBet", value)
-        );
-      } else {
-        commit("setDisplayedBet", newBet);
-      }
+      commit("setTokenAmount", amount);
+      commit("setDisplayedTokenAmount", amount);
+      animateValue(oldBet, getters.bet, (value) =>
+        commit("setDisplayedBet", value)
+      );
     },
 
     /**
@@ -114,23 +83,15 @@ const store = new Vuex.Store({
      * @param {ActionContext} context
      * @param {Number} amount - New value of token goal.
      */
-    setTokenGoal: (
-      { commit, getters },
-      { amount, animateBet = true }
-    ) => {
-      const oldBet = getters.bet;
+    setTokenGoal: ({ commit, getters }, amount) => {
+      commit("pushHistory");
 
+      const oldBet = getters.bet;
       commit("setTokenGoal", amount);
 
-      const newBet = getters.bet;
-
-      if (animateBet) {
-        animateValue(oldBet, newBet, (value) =>
-          commit("setDisplayedBet", value)
-        );
-      } else {
-        commit("setDisplayedBet", newBet);
-      }
+      animateValue(oldBet, getters.bet, (value) =>
+        commit("setDisplayedBet", value)
+      );
     },
 
     /**
@@ -139,8 +100,21 @@ const store = new Vuex.Store({
      * @param {ActionContext} context
      * @param {Number} amount - Amount to increment tokens with.
      */
-    incrementTokens: ({ dispatch, state }, amount) => {
-      dispatch("setTokens", { amount: state.tokens + amount });
+    incrementTokenAmount: ({ commit, getters, state }, amount) => {
+      commit("pushHistory");
+
+      const oldTokenAmount = state.tokenAmount;
+      const oldBet = getters.bet;
+
+      commit("setTokenAmount", state.tokenAmount + amount);
+
+      animateValue(oldTokenAmount, state.tokenAmount, (value) =>
+        commit("setDisplayedTokenAmount", value)
+      );
+
+      animateValue(oldBet, getters.bet, (value) =>
+        commit("setDisplayedBet", value)
+      );
     },
 
     /**
@@ -148,7 +122,8 @@ const store = new Vuex.Store({
      *
      * @param {ActionContext} context
      */
-    winBet: ({ getters, dispatch }) => dispatch("incrementTokens", getters.bet),
+    winBet: ({ getters, dispatch }) =>
+      dispatch("incrementTokenAmount", getters.bet),
 
     /**
      * Updates the state as if the bet was lost.
@@ -156,21 +131,28 @@ const store = new Vuex.Store({
      * @param {ActionContext} context
      */
     loseBet: ({ getters, dispatch }) =>
-      dispatch("incrementTokens", -getters.bet),
+      dispatch("incrementTokenAmount", -getters.bet),
 
     /**
      * Undos last action.
      *
      * @param {ActionContext} context
      */
-    undo: ({ commit, dispatch }) => {
-      commit("popHistory", (action) => {
-        if (action.kind === "tokens-changed") {
-          dispatch("setTokens", {
-            amount: action.from,
-            pushHistory: false,
-          });
-        }
+    undo: ({ commit, getters, state }) => {
+      commit("popHistory", ({ tokenAmount, tokenGoal }) => {
+        const oldTokenAmount = state.tokenAmount;
+        const oldBet = getters.bet;
+
+        commit("setTokenAmount", tokenAmount);
+        commit("setTokenGoal", tokenGoal);
+
+        animateValue(oldTokenAmount, state.tokenAmount, (value) =>
+          commit("setDisplayedTokenAmount", value)
+        );
+
+        animateValue(oldBet, getters.bet, (value) =>
+          commit("setDisplayedBet", value)
+        );
       });
     },
   },
