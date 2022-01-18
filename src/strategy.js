@@ -1,8 +1,26 @@
+//
+// Helpers
+// -------------------------------------------------------------------------------------------------
+
+function bound(minValue, value, maxValue) {
+  return Math.max(minValue, Math.min(value, maxValue));
+}
+
+//
+// Strategy
+// -------------------------------------------------------------------------------------------------
+
 class Strategy {
+  /**
+   * Name of the strategy.
+   */
   get strategyName() {
     return "None";
   }
 
+  /**
+   * Amount of tokens the bet should be at.
+   */
   get bet() {
     return 0;
   }
@@ -36,12 +54,30 @@ class Strategy {
   }
 }
 
+//
+// Kelly bet strategy
+// -------------------------------------------------------------------------------------------------
+
+/**
+ * Kelly bet, or Kelly criterion, is a strategy of finding the optimal sized bet.
+ *
+ * See https://en.wikipedia.org/wiki/Kelly_criterion.
+ */
 export class KellyBetStrategy extends Strategy {
   _bet = 0;
 
   constructor({ tokenAmount, tokenGoal }) {
     super();
-    this._bet = KellyBetStrategy.#evaluateBet(tokenAmount, tokenGoal);
+
+    if (tokenAmount === 1) {
+      this._bet = 1;
+    } else {
+      this._bet = bound(
+        0,
+        Math.floor(tokenAmount / 2),
+        tokenGoal - tokenAmount
+      );
+    }
   }
 
   get strategyName() {
@@ -50,15 +86,6 @@ export class KellyBetStrategy extends Strategy {
 
   get bet() {
     return this._bet;
-  }
-
-  static #evaluateBet(tokenAmount, tokenGoal) {
-    const maxBet = tokenGoal - tokenAmount;
-    if (tokenAmount === 1) {
-      return 1;
-    } else {
-      return Math.max(0, Math.min(maxBet, Math.floor(tokenAmount / 2)));
-    }
   }
 
   nextStrategyForWin(payload) {
@@ -78,14 +105,22 @@ export class KellyBetStrategy extends Strategy {
   }
 }
 
+//
+// Martingale strategy
+// -------------------------------------------------------------------------------------------------
+
+/**
+ * In the martingale betting strategy the player doubles their bet each loss in order to eventually
+ * win it back with a profit.
+ *
+ * See https://en.wikipedia.org/wiki/Martingale_(betting_system).
+ */
 export class MartingaleStrategy extends Strategy {
   _bet = 0;
 
   constructor({ tokenAmount, tokenGoal }) {
     super();
-
-    const maxBet = tokenGoal - tokenAmount;
-    this._bet = Math.max(0, Math.min(maxBet, Math.ceil(tokenAmount / 31)));
+    this._bet = bound(0, Math.ceil(tokenAmount / 32), tokenGoal - tokenAmount);
   }
 
   get strategyName() {
@@ -101,7 +136,6 @@ export class MartingaleStrategy extends Strategy {
   }
 
   nextStrategyForLose(payload) {
-    console.log(payload);
     return new MartingaleLostStrategy({ ...payload, bet: this._bet });
   }
 
@@ -121,8 +155,7 @@ class MartingaleLostStrategy extends MartingaleStrategy {
     const { tokenAmount, tokenGoal, bet } = payload;
 
     if (bet * 2 < tokenAmount) {
-      const maxBet = tokenGoal - tokenAmount;
-      this._bet = Math.max(0, Math.min(maxBet, Math.max(this._bet, bet * 2)));
+      this._bet = bound(0, bet * 2, tokenGoal - tokenAmount);
     }
   }
 }
@@ -134,8 +167,7 @@ class MartingaleModifiedStrategy extends MartingaleStrategy {
     const { tokenAmount, tokenGoal, bet } = payload;
 
     if (bet < tokenAmount) {
-      const maxBet = tokenGoal - tokenAmount;
-      this._bet = Math.max(0, Math.min(maxBet, Math.max(this._bet, bet)));
+      this._bet = bound(0, Math.max(this._bet, bet), tokenGoal - tokenAmount);
     }
   }
 }
