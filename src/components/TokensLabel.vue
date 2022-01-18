@@ -17,7 +17,7 @@ export default {
   name: "TokensLabel",
   methods: {
     customSetTokenAmount(event) {
-      this.$store.dispatch("setCustomTokenAmount", event.target.value);
+      this.$store.dispatch("setCustomTokenAmount", Number(event.target.value));
     },
   },
 };

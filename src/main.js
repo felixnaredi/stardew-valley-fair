@@ -2,7 +2,7 @@ import { createApp } from "vue";
 import anime from "animejs/lib/anime.es.js";
 import App from "./App.vue";
 import Vuex from "vuex";
-import { KellyBetStrategy } from "./strategy";
+import { /* KellyBetStrategy, */ MartingaleStrategy } from "./strategy";
 
 /**
  * Creates an animation between two numeric values.
@@ -24,7 +24,14 @@ function animateValue(from, to, callback) {
 const INITIAL_TOKEN_AMOUNT = 1000;
 const INITIAL_TOKEN_GOAL = 2000;
 
+/*
 const INITIAL_STRATEGY = new KellyBetStrategy({
+  tokenAmount: INITIAL_TOKEN_AMOUNT,
+  tokenGoal: INITIAL_TOKEN_GOAL,
+});
+*/
+
+const INITIAL_STRATEGY = new MartingaleStrategy({
   tokenAmount: INITIAL_TOKEN_AMOUNT,
   tokenGoal: INITIAL_TOKEN_GOAL,
 });
@@ -185,7 +192,7 @@ const store = new Vuex.Store({
 
       dispatch("incrementTokenAmount", -getters.bet);
       commit("nextStrategyAfterLosingBet");
-      
+
       animateValue(oldBet, getters.bet, (value) =>
         commit("setDisplayedBet", value)
       );

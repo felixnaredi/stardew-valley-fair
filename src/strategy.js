@@ -77,3 +77,65 @@ export class KellyBetStrategy extends Strategy {
     return new KellyBetStrategy(payload);
   }
 }
+
+export class MartingaleStrategy extends Strategy {
+  _bet = 0;
+
+  constructor({ tokenAmount, tokenGoal }) {
+    super();
+
+    const maxBet = tokenGoal - tokenAmount;
+    this._bet = Math.max(0, Math.min(maxBet, Math.ceil(tokenAmount / 31)));
+  }
+
+  get strategyName() {
+    return "Martingale";
+  }
+
+  get bet() {
+    return this._bet;
+  }
+
+  nextStrategyForWin(payload) {
+    return new MartingaleStrategy(payload);
+  }
+
+  nextStrategyForLose(payload) {
+    console.log(payload);
+    return new MartingaleLostStrategy({ ...payload, bet: this._bet });
+  }
+
+  nextStrategyForTokenAmountChanged(payload) {
+    return new MartingaleModifiedStrategy({ ...payload, bet: this._bet });
+  }
+
+  nextStrategyForTokenGoalChanged(payload) {
+    return new MartingaleModifiedStrategy({ ...payload, bet: this._bet });
+  }
+}
+
+class MartingaleLostStrategy extends MartingaleStrategy {
+  constructor(payload) {
+    super(payload);
+
+    const { tokenAmount, tokenGoal, bet } = payload;
+
+    if (bet * 2 < tokenAmount) {
+      const maxBet = tokenGoal - tokenAmount;
+      this._bet = Math.max(0, Math.min(maxBet, Math.max(this._bet, bet * 2)));
+    }
+  }
+}
+
+class MartingaleModifiedStrategy extends MartingaleStrategy {
+  constructor(payload) {
+    super(payload);
+
+    const { tokenAmount, tokenGoal, bet } = payload;
+
+    if (bet < tokenAmount) {
+      const maxBet = tokenGoal - tokenAmount;
+      this._bet = Math.max(0, Math.min(maxBet, Math.max(this._bet, bet)));
+    }
+  }
+}
