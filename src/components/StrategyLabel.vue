@@ -1,14 +1,15 @@
 <template>
   <main class="row">
-    <span class="col-3">Strategy</span>
-    <select class="col-3" @change="strategyChanged">
+    <span class="col-3 me-1">Strategy</span>
+    <select class="col-7" @change="strategyChanged">
       <option
-        v-for="strategy in strategies"
-        :key="strategy.key"
-        :value="strategy.key"
-        :selected="selected(strategy.value)"
+        v-for="{ key, strategy } in strategies"
+        class="w-100"
+        :key="key"
+        :value="key"
+        :selected="selected(strategy)"
       >
-        {{ strategy.value.strategyName }}
+        {{ strategy.strategyName }}
       </option>
     </select>
   </main>
@@ -25,7 +26,7 @@ import { mapState } from "vuex";
 export default {
   name: "StrategyLabel",
   created() {
-    this.setStrategy(this.strategies[0].value);
+    this.setStrategy(this.strategies[0].strategy);
   },
   computed: mapState({
     tokenAmount: (state) => state.tokenAmount,
@@ -34,14 +35,14 @@ export default {
       return {
         0: {
           key: 0,
-          value: new KellyBetStrategy({
+          strategy: new KellyBetStrategy({
             tokenAmount: state.tokenAmount,
             tokenGoal: state.tokenGoal,
           }),
         },
         1: {
           key: 1,
-          value: new MartingaleStrategy({
+          strategy: new MartingaleStrategy({
             tokenAmount: state.tokenAmount,
             tokenGoal: state.tokenGoal,
           }),
@@ -61,7 +62,7 @@ export default {
     },
     strategyChanged(event) {
       const key = event.target.value;
-      this.$store.dispatch("changeStrategy", this.strategies[key].value);
+      this.$store.dispatch("changeStrategy", this.strategies[key].strategy);
     },
   },
 };

@@ -1,6 +1,6 @@
 <template>
   <main class="row">
-    <span class="col-3">Goal</span>
+    <span class="col-3 me-1">Goal</span>
     <input
       v-if="customAmount"
       id="custom-token-goal-amount-input"
