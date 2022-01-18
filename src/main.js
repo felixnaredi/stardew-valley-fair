@@ -54,6 +54,18 @@ const store = new Vuex.Store({
     },
   },
   actions: {
+    /**
+     * Set tokens to `amount`.
+     *
+     * The `payload` can contain the following fields:
+     *   - amount: The amount to set `tokens` to (required).
+     *   - pushHistory: If true the change will be pushed to `history` (defaults to `true`).
+     *   - animateTokens: If true, `displayedTokens` will be animated (defaults to `true`).
+     *   - animateBet: If true, `displayedBet` will be animated (defaults to `true`).
+     *
+     * @param {ActionContext} context
+     * @param {Object} payload - Descriptor for the modification. Must include field `amount`.
+     */
     setTokens: (
       { state, getters, commit },
       { amount, pushHistory = true, animateTokens = true, animateBet = true }
@@ -95,7 +107,17 @@ const store = new Vuex.Store({
         commit("setDisplayedBet", newBet);
       }
     },
-    setTokenGoal: ({ getters, commit }, { amount, animateBet = true }) => {
+
+    /**
+     * Sets the token goal to `amount`.
+     *
+     * @param {ActionContext} context
+     * @param {Number} amount - New value of token goal.
+     */
+    setTokenGoal: (
+      { commit, getters },
+      { amount, animateBet = true }
+    ) => {
       const oldBet = getters.bet;
 
       commit("setTokenGoal", amount);
@@ -110,12 +132,37 @@ const store = new Vuex.Store({
         commit("setDisplayedBet", newBet);
       }
     },
+
+    /**
+     * Increments the current amount of tokens with `amount`.
+     *
+     * @param {ActionContext} context
+     * @param {Number} amount - Amount to increment tokens with.
+     */
     incrementTokens: ({ dispatch, state }, amount) => {
       dispatch("setTokens", { amount: state.tokens + amount });
     },
+
+    /**
+     * Updates the state as if the bet was won.
+     *
+     * @param {ActionContext} context
+     */
     winBet: ({ getters, dispatch }) => dispatch("incrementTokens", getters.bet),
+
+    /**
+     * Updates the state as if the bet was lost.
+     *
+     * @param {ActionContext} context
+     */
     loseBet: ({ getters, dispatch }) =>
       dispatch("incrementTokens", -getters.bet),
+
+    /**
+     * Undos last action.
+     *
+     * @param {ActionContext} context
+     */
     undo: ({ commit, dispatch }) => {
       commit("popHistory", (action) => {
         if (action.kind === "tokens-changed") {
