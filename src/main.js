@@ -23,7 +23,11 @@ function animateValue(from, to, callback) {
 
 const INITIAL_TOKEN_AMOUNT = 1000;
 const INITIAL_TOKEN_GOAL = 2000;
-const INITIAL_STRATEGY = new KellyBetStrategy();
+
+const INITIAL_STRATEGY = new KellyBetStrategy({
+  tokenAmount: INITIAL_TOKEN_AMOUNT,
+  tokenGoal: INITIAL_TOKEN_GOAL,
+});
 
 const store = new Vuex.Store({
   state: {
@@ -32,14 +36,10 @@ const store = new Vuex.Store({
     strategy: INITIAL_STRATEGY,
     history: [],
     displayedTokenAmount: INITIAL_TOKEN_AMOUNT,
-    displayedBet: INITIAL_STRATEGY.getBetSize(
-      INITIAL_TOKEN_AMOUNT,
-      INITIAL_TOKEN_GOAL
-    ),
+    displayedBet: INITIAL_STRATEGY.bet,
   },
   getters: {
-    bet: (state) =>
-      state.strategy.getBetSize(state.tokenAmount, state.tokenGoal),
+    bet: (state) => state.strategy.bet,
   },
   mutations: {
     setDisplayedTokenAmount: (state, amount) =>
@@ -47,11 +47,55 @@ const store = new Vuex.Store({
     setDisplayedBet: (state, amount) => (state.displayedBet = amount),
     setTokenAmount: (state, amount) => (state.tokenAmount = amount),
     setTokenGoal: (state, newAmount) => (state.tokenGoal = newAmount),
+    setStrategy: (state, strategy) => (state.strategy = strategy),
+
+    /**
+     * Updates the strategy for a winning bet.
+     * @param {} state
+     */
+    nextStrategyAfterWinningBet: (state) =>
+      (state.strategy = state.strategy.nextStrategyForWin({
+        tokenAmount: state.tokenAmount,
+        tokenGoal: state.tokenGoal,
+      })),
+
+    /**
+     * Updates the strategy for a loosing bet.
+     * @param {} state
+     */
+    nextStrategyAfterLosingBet: (state) =>
+      (state.strategy = state.strategy.nextStrategyForLose({
+        tokenAmount: state.tokenAmount,
+        tokenGoal: state.tokenGoal,
+      })),
+
+    /**
+     * Updates the strategy for when the `state.tokenAmount` changes.
+     * @param {} state
+     */
+    nextStrategyAfterTokenAmountChanged: (state) =>
+      (state.strategy = state.strategy.nextStrategyForTokenAmountChanged({
+        tokenAmount: state.tokenAmount,
+        tokenGoal: state.tokenGoal,
+      })),
+
+    /**
+     * Updates the strategy for when the `state.tokenGoal` changes.
+     * @param {} state
+     */
+    nextStrategyAfterTokenGoalChanged: (state) =>
+      (state.strategy = state.strategy.nextStrategyForTokenGoalChanged({
+        tokenAmount: state.tokenAmount,
+        tokenGoal: state.tokenGoal,
+      })),
+
     pushHistory: (state) =>
       state.history.push({
         tokenAmount: state.tokenAmount,
         tokenGoal: state.tokenGoal,
+        strategy: state.strategy,
       }),
+
     popHistory: (state, callback) => {
       const lastAction = state.history.pop();
       if (lastAction) {
@@ -68,10 +112,13 @@ const store = new Vuex.Store({
      */
     setCustomTokenAmount({ commit, getters }, amount) {
       commit("pushHistory");
-
       const oldBet = getters.bet;
+
       commit("setTokenAmount", amount);
+      commit("nextStrategyAfterTokenAmountChanged");
+
       commit("setDisplayedTokenAmount", amount);
+
       animateValue(oldBet, getters.bet, (value) =>
         commit("setDisplayedBet", value)
       );
@@ -88,6 +135,7 @@ const store = new Vuex.Store({
 
       const oldBet = getters.bet;
       commit("setTokenGoal", amount);
+      commit("nextStrategyAfterTokenGoalChanged");
 
       animateValue(oldBet, getters.bet, (value) =>
         commit("setDisplayedBet", value)
@@ -100,20 +148,14 @@ const store = new Vuex.Store({
      * @param {ActionContext} context
      * @param {Number} amount - Amount to increment tokens with.
      */
-    incrementTokenAmount: ({ commit, getters, state }, amount) => {
+    incrementTokenAmount: ({ commit, state }, amount) => {
       commit("pushHistory");
 
       const oldTokenAmount = state.tokenAmount;
-      const oldBet = getters.bet;
-
       commit("setTokenAmount", state.tokenAmount + amount);
 
       animateValue(oldTokenAmount, state.tokenAmount, (value) =>
         commit("setDisplayedTokenAmount", value)
-      );
-
-      animateValue(oldBet, getters.bet, (value) =>
-        commit("setDisplayedBet", value)
       );
     },
 
@@ -122,16 +164,32 @@ const store = new Vuex.Store({
      *
      * @param {ActionContext} context
      */
-    winBet: ({ getters, dispatch }) =>
-      dispatch("incrementTokenAmount", getters.bet),
+    winBet: ({ commit, dispatch, getters }) => {
+      const oldBet = getters.bet;
+
+      dispatch("incrementTokenAmount", getters.bet);
+      commit("nextStrategyAfterWinningBet");
+
+      animateValue(oldBet, getters.bet, (value) =>
+        commit("setDisplayedBet", value)
+      );
+    },
 
     /**
      * Updates the state as if the bet was lost.
      *
      * @param {ActionContext} context
      */
-    loseBet: ({ getters, dispatch }) =>
-      dispatch("incrementTokenAmount", -getters.bet),
+    loseBet: ({ commit, dispatch, getters }) => {
+      const oldBet = getters.bet;
+
+      dispatch("incrementTokenAmount", -getters.bet);
+      commit("nextStrategyAfterLosingBet");
+      
+      animateValue(oldBet, getters.bet, (value) =>
+        commit("setDisplayedBet", value)
+      );
+    },
 
     /**
      * Undos last action.
@@ -139,12 +197,13 @@ const store = new Vuex.Store({
      * @param {ActionContext} context
      */
     undo: ({ commit, getters, state }) => {
-      commit("popHistory", ({ tokenAmount, tokenGoal }) => {
+      commit("popHistory", ({ tokenAmount, tokenGoal, strategy }) => {
         const oldTokenAmount = state.tokenAmount;
         const oldBet = getters.bet;
 
         commit("setTokenAmount", tokenAmount);
         commit("setTokenGoal", tokenGoal);
+        commit("setStrategy", strategy);
 
         animateValue(oldTokenAmount, state.tokenAmount, (value) =>
           commit("setDisplayedTokenAmount", value)
