@@ -2,7 +2,6 @@ import { createApp } from "vue";
 import anime from "animejs/lib/anime.es.js";
 import App from "./App.vue";
 import Vuex from "vuex";
-import { /* KellyBetStrategy, */ MartingaleStrategy } from "./strategy";
 
 /**
  * Creates an animation between two numeric values.
@@ -24,29 +23,23 @@ function animateValue(from, to, callback) {
 const INITIAL_TOKEN_AMOUNT = 1000;
 const INITIAL_TOKEN_GOAL = 2000;
 
-/*
-const INITIAL_STRATEGY = new KellyBetStrategy({
-  tokenAmount: INITIAL_TOKEN_AMOUNT,
-  tokenGoal: INITIAL_TOKEN_GOAL,
-});
-*/
-
-const INITIAL_STRATEGY = new MartingaleStrategy({
-  tokenAmount: INITIAL_TOKEN_AMOUNT,
-  tokenGoal: INITIAL_TOKEN_GOAL,
-});
-
 const store = new Vuex.Store({
   state: {
     tokenAmount: INITIAL_TOKEN_AMOUNT,
     tokenGoal: INITIAL_TOKEN_GOAL,
-    strategy: INITIAL_STRATEGY,
+    strategy: null,
     history: [],
     displayedTokenAmount: INITIAL_TOKEN_AMOUNT,
-    displayedBet: INITIAL_STRATEGY.bet,
+    displayedBet: null,
   },
   getters: {
-    bet: (state) => state.strategy.bet,
+    bet: (state) => {
+      if (state.strategy) {
+        return state.strategy.bet;
+      } else {
+        return 0;
+      }
+    },
   },
   mutations: {
     setDisplayedTokenAmount: (state, amount) =>
@@ -111,6 +104,32 @@ const store = new Vuex.Store({
     },
   },
   actions: {
+    /**
+     * Sets strategy and animates changes.
+     *
+     * @param {ActionContext} context
+     * @param {Strategy} strategy
+     */
+    setStrategy({ commit, getters }, strategy) {      
+      const oldBet = getters.bet;
+      commit("setStrategy", strategy);
+
+      animateValue(oldBet, getters.bet, (value) =>
+        commit("setDisplayedBet", value)
+      );
+    },
+
+    /**
+     * Changes the current strategy.
+     * 
+     * @param {ActionContext} context 
+     * @param {Strategy} strategy 
+     */
+    changeStrategy({ commit, dispatch }, strategy) {
+      commit("pushHistory");
+      dispatch("setStrategy", strategy);
+    },
+
     /**
      * Sets `state.tokenAmount` to an custom amount.
      *
