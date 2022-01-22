@@ -16,10 +16,11 @@ fn kelly(tokens: i32, goal: i32) -> (bool, u32)
     let mut count = 0;
     let mut tokens = tokens;
 
-    while tokens > 1 && tokens < goal {
+    while tokens > 0 && tokens < goal {
         count += 1;
 
-        let bet = if tokens == 1 { 1 } else { tokens / 2 };
+        let bet = ((tokens as f32) * 0.5).floor() as i32;
+        let bet = if bet == 0 { 1 } else { bet };
         let bet = bet.min(goal - tokens);
         roll(&mut tokens, bet);
 
@@ -51,6 +52,7 @@ fn main()
         }
     }
 
+    println!("---- info ---");
     println!("initial tokens: {}", initial);
     println!("goal: {}", goal);
     println!("successes: {}", success_count);
