@@ -1,17 +1,21 @@
 <template>
   <main class="row m-1">
     <div
-      class="col-2 m-1 bg-green highlight-active"
+      class="d-flex col-2 m-1 bg-green highlight-active justify-content-center align-items-center"
       @mousedown="$store.dispatch('winBet')"
       tabindex="0"
       role="button"
-    />
+    >
+      <span class="h3 text-white fw-bold m-0">WIN</span>
+    </div>
     <div
-      class="col-2 m-1 bg-orange highlight-active"
+      class="d-flex col-2 m-1 bg-orange highlight-active justify-content-center align-items-center"
       @mousedown="$store.dispatch('loseBet')"
       tabindex="0"
       role="button"
-    />
+    >
+      <span class="h3 text-white fw-bold m-0">LOSE</span>
+    </div>
   </main>
 </template>
 
