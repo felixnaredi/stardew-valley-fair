@@ -36,6 +36,11 @@
         Repeat these steps until the token goal is aquired:
       </p>
       <li class="list-group-item">
+        <span>Always bet on </span
+        ><span class="bg-green text-white ps-1 pe-1">GREEN</span
+        ><span>. The wheel has a 3/4 chance of ending up on it.</span>
+      </li>
+      <li class="list-group-item">
         <span
           >Place a bet with the same amount of tokens as the value next to
           <i>Bet</i>. Currently at
@@ -43,11 +48,6 @@
         <div class="d-inline-block">
           <span>{{ $store.state.displayedBet }} tokens.</span>
         </div>
-      </li>
-      <li class="list-group-item">
-        <span>Always bet on </span
-        ><span class="bg-green text-white ps-1 pe-1">GREEN</span
-        ><span>. The wheel has a 3/4 chance of ending up on it.</span>
       </li>
       <li class="list-group-item">
         <span>If the wheel ended on green, click on the green box </span>
