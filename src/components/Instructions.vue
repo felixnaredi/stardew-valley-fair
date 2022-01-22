@@ -4,16 +4,16 @@
       class="m-2 d-inline p-3 ps-0"
       data-bs-toggle="collapse"
       data-bs-target="#instruction-list"
-      aria-expanded="false"
+      :aria-expanded="showInstructions"
       aria-controls="instruction-list"
       role="button"
-      @click="hideInstructions = !hideInstructions"
+      @click="showInstructions = !showInstructions"
     >
       <span>Instructions</span>
-      <span class="ms-2">{{ hideInstructions ? "▶" : "▼" }}</span>
+      <span class="ms-2">{{ showInstructions ? "▼" : "▶" }}</span>
     </div>
   </div>
-  <div id="instruction-list" class="collapse">
+  <div id="instruction-list" class="collapse show">
     <ol class="list-group list-group-numbered">
       <li class="list-group-item">
         <span
@@ -80,7 +80,7 @@
 export default {
   data() {
     return {
-      hideInstructions: true,
+      showInstructions: true,
     };
   },
   mounted() {
